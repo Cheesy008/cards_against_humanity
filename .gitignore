@@ -3,7 +3,7 @@ backend/chat/.idea/
 backend/game/.idea/
 backend/game/.env
 
-env
+env/*.env
 pg_data_dev/
 
 # dependencies
