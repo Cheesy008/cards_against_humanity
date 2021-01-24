@@ -9,7 +9,7 @@
           <v-list style="height: 400px" ref="chat" id="logs">
             <template v-for="(message, index) in messages">
               <v-subheader v-if="message" :key="index">
-                {{printUserMessage(message)}}
+                {{printMessage(message)}}
               </v-subheader>
             </template>
           </v-list>
@@ -17,7 +17,7 @@
         <v-card-actions style="justify-content: center">
           <v-form>
             <div class="wrapper">
-              <v-text-field single-line v-model="msg" label="Текст сообщения" style="margin-right: 10px"></v-text-field>
+              <v-text-field single-line v-model="messageText" label="Текст сообщения" style="margin-right: 10px"></v-text-field>
               <v-btn @click.prevent="submitMessage" color="primary" type="submit">Сказать</v-btn>
             </div>
           </v-form>
@@ -28,52 +28,58 @@
 </template>
 
 <script>
+import {MessageType} from "@/utils/enums";
+import moment from "moment";
+
+import {mapState, mapMutations} from 'vuex'
+
 export default {
   data() {
     return {
-      messages: [],
-      msg: '',
+      messageText: '',
       socket: null
     }
   },
   methods: {
-    printUserMessage(message) {
-      return `${this.currentTimeFormatted} [${this.$auth.user.username}] ${message}`
+    ...mapMutations({
+      pushMessage: "chat/PUSH_MESSAGE"
+    }),
+    printMessage(message) {
+      const messageText = message['message_text']
+      const date = moment(message['date']).format('h:mm')
+      const username = message['username']
+      const messageType = message['message_type']
+
+      const userMessage = `${date} [${username}] ${messageText}`
+      const gameMessage = `${date} ${messageText}`
+
+      return messageType == MessageType.MESSAGE ? userMessage :gameMessage
     },
     submitMessage() {
-      this.socket.send(JSON.stringify({'message': this.msg, 'room_id': this.$route.params.id}))
-      this.msg = ''
+      this.socket.send(JSON.stringify({'message_text': this.messageText}))
+      this.messageText = ''
     },
-    connect() {
+    websocketConnect() {
       this.socket = new WebSocket(
-        `ws://localhost:4000/api/v1/chat/ws/${this.$route.params.id}/${this.$auth.user.username}`
+        `ws://localhost:4000/ws/${this.$route.params.id}/${this.$auth.user.username}`
       )
 
       this.socket.onmessage = (event) => {
         console.log(event)
         const data = JSON.parse(event.data)
-        this.messages.push(data['text'])
+        this.pushMessage(data['message'])
       }
 
-      // this.socket.onopen = (event) => {
-      //   this.messages.push(`Игрок ${this.$auth.user.username} присоединился к игре`)
-      //   console.log(event, 'Connected')
-      // }
-      //
-      // this.socket.onclose = (event) => {
-      //   this.messages.push(`Игрок ${this.$auth.user.username} вышел из игры`)
-      // }
     },
   },
   computed: {
-    currentTimeFormatted() {
-      const time = new Date();
-      return `${time.getHours()}:${time.getMinutes()}`
-    }
+    ...mapState('chat', {
+      messages: state => state.messages
+    })
   },
   mounted() {
-    this.connect()
-  }
+    this.websocketConnect()
+  },
 }
 </script>
 

@@ -12,7 +12,7 @@ services:
 
   backend_chat:
     build: ./backend/chat
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "4000", "--reload"]
+    command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "4000", "--reload"]
     volumes:
       - ./backend/chat:/code
     ports:
