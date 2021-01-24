@@ -49,9 +49,7 @@ export default {
   methods: {
     login() {
       this.$auth.loginWith('local', {data: this.form})
-      .then(() => {
-        this.$router.push({name: 'index'})
-      })
+      .then(() => this.$router.push({name: 'index'}))
       .catch(err => console.log(err))
     }
   }

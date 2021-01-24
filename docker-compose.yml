@@ -1,32 +1,32 @@
 version: "3"
 services:
   backend_game:
-    build: ./backend
-    command: ["./game/manage.py", "runserver", "0.0.0.0:8000"]
+    build: ./backend/game
+    command: ["./manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
-      - ./backend/game:/code/game
+      - ./backend/game:/code
     env_file:
       - ./env/backend_game.env
     ports:
       - "8000:8000"
 
   backend_chat:
-    build: ./backend
-    command: ["uvicorn", "chat.main:app", "--host", "0.0.0.0", "--port", "4000"]
+    build: ./backend/chat
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "4000", "--reload"]
     volumes:
-      - ./backend/chat:/code/chat
+      - ./backend/chat:/code
     ports:
       - "4000:4000"
 
-  frontend:
-    build: ./frontend
-    volumes:
-    - /app/node_modules
-    - ./frontend:/app
-    environment:
-    - HOST=0.0.0.0
-    ports:
-    - "3000:3000"
+#  frontend:
+#    build: ./frontend
+#    stdin_open: true
+#    volumes:
+#    - ./frontend:/app
+#    environment:
+#    - HOST=0.0.0.0
+#    ports:
+#    - "3000:3000"
 
   postgres:
     image: postgres:11.6-alpine

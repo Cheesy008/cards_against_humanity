@@ -41,11 +41,6 @@ export default {
       gameList: 'game/getGameList'
     })
   },
-  sockets: {
-    connect() {
-      console.log('connected')
-    }
-  },
   async fetch({store}) {
     await store.dispatch('game/FETCH_GAME_LIST')
   }

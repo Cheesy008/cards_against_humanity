@@ -36,10 +36,10 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
-    {
-      src: '@/plugins/socket',
-      ssr: false
-    }
+    // {
+    //   src: '@/plugins/socket',
+    //   ssr: false
+    // }
   ],
   /*
   ** Auto import components
@@ -73,7 +73,8 @@ export default {
       local: {
         token: {
           property: 'token',
-          type: 'Token'
+          type: 'Token',
+          maxAge: false
         },
         user: {
           property: 'user',
